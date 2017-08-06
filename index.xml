@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>肖文</title>
+    <title>肖文&#39;s HomePage</title>
     <link>https://hsiaovin.github.io/</link>
-    <description>Recent content on 肖文</description>
+    <description>Recent content on 肖文&#39;s HomePage</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 06 Aug 2017 16:59:54 +0800</lastBuildDate>
@@ -18,16 +18,6 @@
       
       <guid>https://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--arena/</guid>
       <description>&lt;p&gt;Arena是LevelDB中的内存管理类。用于减少new调用的次数，减少频繁分配小块内存带来的系统开销，也避免直接分配大块内存浪费空间的问题。使用Arena管理内存的分配，简化了new和delete的调用。
-&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>LevelDB源码 -- Cache</title>
-      <link>https://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--cache/</link>
-      <pubDate>Sun, 06 Aug 2017 16:59:54 +0800</pubDate>
-      
-      <guid>https://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--cache/</guid>
-      <description>&lt;p&gt;LevelDB的缓存实现。内部实现的LRUCache。
 &lt;/p&gt;</description>
     </item>
     
