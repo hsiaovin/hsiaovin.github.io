@@ -158,8 +158,8 @@ char* Arena::AllocateNewBlcok(size_t block_bytes) {
 <p><strong>Arena的构造和析构</strong></p>
 
 <pre><code>Arena::Arena() : memory_usage_(0) {
-	alloc_ptr_ = NULL;
-	alloc_bytes_remaining_ = 0;
+    alloc_ptr_ = NULL;
+    alloc_bytes_remaining_ = 0;
 }
 
 Arena::~Arena() {
