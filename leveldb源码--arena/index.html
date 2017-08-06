@@ -163,13 +163,13 @@ char* Arena::AllocateNewBlcok(size_t block_bytes) {
 }
 
 Arena::~Arena() {
-	for (size_t i = 0; i &lt; blocks_size(); i++) {
-		delete[] blocks_[i];
-	}
+    for (size_t i = 0; i &lt; blocks_size(); i++) {
+        delete[] blocks_[i];
+    }
 }
 </code></pre>
 
-<p><strong>Arena的内存分配策略总结：</strong></p>
+<p><strong>Arena的内存分配策略：</strong></p>
 
 <ol>
 <li>当block有足够剩余的内存时，直接用剩余的内存分配</li>
