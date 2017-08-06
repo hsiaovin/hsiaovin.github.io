@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>肖文</title>
+    <link>http://hsiaovin.github.io/</link>
+    <description>Recent content on 肖文</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 06 Aug 2017 16:59:54 +0800</lastBuildDate>
+    
+	<atom:link href="http://hsiaovin.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>LevelDB源码 -- Arena</title>
+      <link>http://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--arena/</link>
+      <pubDate>Sun, 06 Aug 2017 16:59:54 +0800</pubDate>
+      
+      <guid>http://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--arena/</guid>
+      <description>&lt;p&gt;Arena是LevelDB中的内存管理类。用于减少new调用的次数，减少频繁分配小块内存带来的系统开销，也避免直接分配大块内存浪费空间的问题。使用Arena管理内存的分配，简化了new和delete的调用。
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>LevelDB源码 -- Cache</title>
+      <link>http://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--cache/</link>
+      <pubDate>Sun, 06 Aug 2017 16:59:54 +0800</pubDate>
+      
+      <guid>http://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81--cache/</guid>
+      <description>&lt;p&gt;LevelDB的缓存实现。内部实现的LRUCache。
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>LevelDB源码分析</title>
+      <link>http://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81/</link>
+      <pubDate>Sun, 06 Aug 2017 16:59:54 +0800</pubDate>
+      
+      <guid>http://hsiaovin.github.io/leveldb%E6%BA%90%E7%A0%81/</guid>
+      <description>&lt;p&gt;LevelDB是由Jeff Dean和Sanjay Ghemawat发起的一套用于持久化数据的高性能类库，key-value储存系统，源码短小精悍，代码风格极好。
+需要注意的是，LevelDB存在一定的限制，需要用户自行实现server，且只有单进程能访问数据库。
+&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
