@@ -1,0 +1,155 @@
+<body>
+  <!DOCTYPE html>
+<html lang="en-us">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta content="" name="keywords">
+<meta content="LevelDB源码 -- BloomFilter - Xiao Wen" property="og:title">
+<title>LevelDB源码 -- BloomFilter | Xiao Wen</title>
+<link rel="stylesheet" href="https://hsiaovin.github.io/css/style.css">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+
+
+  <section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://hsiaovin.github.io/"><h1 class="title is-2">Xiao Wen</h1></a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile">
+          
+          <a class="level-item" href="hsiaovin@yeah.net">
+            <span class="icon">
+              <i class="fa fa-envelope"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="https://github.com/hsiaovin">
+            <span class="icon">
+              <i class="fa fa-github"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="/index.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+          </a>
+          
+        </nav>
+      </div>
+    </nav>
+  </div>
+</section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="subtitle is-6">2017-8-7</h2>
+      <h1 class="title">LevelDB源码 -- BloomFilter</h1>
+      
+      <div class="content">
+        <p>Bloom Filter是由Bloom在1970年提出的一种空间效率很高的数据结构，它利用位数组很简洁地表示一个集合，通过多个hash算法来共同判断某个元素是否在某个集合内。
+</p>
+
+<p><strong>Bloom Filter插入元素过程的图示：</strong>
+<img src="../bloomfilter.jpg" alt="" /></p>
+
+<p>它相比hash容器的一个优势就是，不需要存储元素的实际数据到容器中去来一个个的比较是否存在。 只需要对应的位段来标记是否存在就行了，所以想当节省内存，特别适合海量的数据处理。可以用于网络爬虫的url重复过滤、垃圾邮件的过滤等等。并且由于省去了存储元素和比较操作，所以性能也比基于hash容器的高了很多。</p>
+
+<p>尽管Bloom Filter通过多个hash算法来降低hash collision，但仍有可能会不属于这个集合的元素误认为属于这个集合。在容忍低错误率的应用场景中，Bloom Filter通过极少的错误换取了存储空间的极大节省。</p>
+
+<p>相关资料：</p>
+
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Bloom_filter">https://en.wikipedia.org/wiki/Bloom_filter</a></li>
+<li><a href="http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html">http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html</a></li>
+</ul>
+
+<h3 id="bloomfilter在leveldb的实现">BloomFilter在LevelDB的实现</h3>
+
+<pre><code>class BloomFilterPolicy : public FilterPolicy {
+private:
+    size_t bits_per_key_; // 位数组大小m/插入的元素数量n
+    size_t k_; // 哈希函数的个数
+
+public:
+    explicit BloomFilterPolicy(int bits_per_key)
+        : bits_per_key_(bits_per_key) {
+            // 当k=ln(2)*(m/n)时出错的概率最小
+            k_ = static_cast&lt;size_t&gt;(bits_per_key * 0.69);  // 0.69 =~ ln(2)
+            // 将哈希函数个数k_控制在1~30之间
+            if (k_ &lt; 1) k_ = 1;
+            if (k_ &gt; 30) k_ = 30;
+    }
+    
+    // keys: 插入的元素;  n: 插入元素的数量; dst: 输出的位数组 
+    virtual void CreateFilter(const Slice* keys, int n, std::string* dst) const {
+        size_t bits = n * bits_per_key_; // 位数组的大小
+        if (bits &lt; 64) bits = 64; // 通过限制最小的位数组大小，降低错误率
+
+        size_t bytes = (bits + 7) / 8; // 计算需要分配的空间
+        bits = bytes * 8;
+
+        const size_t init_size = dst-&gt;size();
+        dst-&gt;resize(init_size + bytes, 0);
+        dst-&gt;push_back(static_cast&lt;char&gt;(k_)); // 将哈希函数个数存放到数组开头
+        char* array = &amp;(*dst)[init_size];
+        for (int i = 0; i &lt; n; i++) {
+            // 使用double-hashing模拟多个哈希函数
+            // https://en.wikipedia.org/wiki/Double_hashing
+            // h(i,k) = (h1(k) + i*h2(k)) % T.size
+            // h1(k) = h, h2(k) = delta, h(i,k) = bitpos
+            uint32_t h = BloomHash(keys[i]);
+            const uint32_t delta = (h &gt;&gt; 17) | (h &lt;&lt; 15);
+            for (size_t j = 0; j &lt; k_; j++) {
+                const uint32_t bitpos = h % bits;
+                // array数组上的每个char有8个位
+                // 将array上相应的位设置为1
+                array[bitpos/8] |= (1 &lt;&lt; (bitpos % 8));
+                h += delta;
+            }
+        }
+    }
+
+    virtual bool KeyMayMatch(const Slice&amp; key, const Slice&amp; bloom_filter) const {
+        const size_t len = bloom_filter.size();
+        if (len &lt; 2) return false;
+
+        const char* array = bloom_filter.data();
+        const size_t bits = (len - 1) * 8;
+
+        const size_t k = array[len-1];
+        if (k &gt; 30) return true;
+
+        uint32_t h = BloomHash(key);
+        const uint32_t delta = (h &gt;&gt; 17) | (h &lt;&lt; 15);  // Rotate right 17 bits
+        for (size_t j = 0; j &lt; k; j++) {
+            const uint32_t bitpos = h % bits;
+            if ((array[bitpos/8] &amp; (1 &lt;&lt; (bitpos % 8))) == 0) return false;
+            h += delta;
+        }
+        return true;
+    }
+};
+</code></pre>
+      </div>
+    </div>
+  </section>
+  
+
+  <section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; 2017 - Xiao Wen </br> Power By <a href="https://gohugo.io">HUGO</a> - <a href="https://gitlab.com/beli3ver/hemingway2">hemingway2</a></p>
+  </div>
+</section>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/go.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+</body>
