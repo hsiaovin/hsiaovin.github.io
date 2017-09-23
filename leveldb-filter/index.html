@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta content="" name="keywords">
-<meta content="LevelDB源码 -- BloomFilter - Xiao Wen" property="og:title">
-<title>LevelDB源码 -- BloomFilter | Xiao Wen</title>
+<meta content="LevelDB源码 -- BloomFilter - VIN" property="og:title">
+<title>LevelDB源码 -- BloomFilter | VIN</title>
 <link rel="stylesheet" href="https://hsiaovin.github.io/css/style.css">
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
@@ -16,12 +16,12 @@
   <div class="container">
     <nav class="nav">
       <div class="nav-left">
-        <a class="nav-item" href="https://hsiaovin.github.io/"><h1 class="title is-2">Xiao Wen</h1></a>
+        <a class="nav-item" href="https://hsiaovin.github.io/"><h1 class="title is-2">VIN</h1></a>
       </div>
       <div class="nav-right">
         <nav class="nav-item level is-mobile">
           
-          <a class="level-item" href="hsiaovin@yeah.net">
+          <a class="level-item" href="mailto:hsiaovin@yeah.net">
             <span class="icon">
               <i class="fa fa-envelope"></i>
             </span>
@@ -57,7 +57,11 @@
 <p><strong>Bloom Filter插入元素过程的图示：</strong>
 <img src="../bloomfilter.jpg" alt="" /></p>
 
-<p>它相比hash容器的一个优势就是，不需要存储元素的实际数据到容器中去来一个个的比较是否存在。 只需要对应的位段来标记是否存在就行了，所以想当节省内存，特别适合海量的数据处理。可以用于网络爬虫的url重复过滤、垃圾邮件的过滤等等。并且由于省去了存储元素和比较操作，所以性能也比基于hash容器的高了很多。</p>
+<blockquote>
+<p>当插入数据时，通过k个哈希算法计算数据的哈希值，并将Bit Array上相应的位设为1。如若要查询数据是否存在，检查Bit Array上相应的位都为1时，则认为数据存在（有可能该数据的所有位都刚好被其他字符串所对应，不能100%肯定存在）。由于删除Bit Arrays上的位会影响到其他数据，Bloom Filter没有删除的功能。（PS：如需删除功能，一种Bloom Filter的变种<strong>Counting Bloom Filter</strong>通过将bit改为计数器实现该功能。）</p>
+</blockquote>
+
+<p>它相比hash容器的一个优势就是，不需要存储元素的实际数据到容器中去来一个个的比较是否存在。 只需要对应的位段来标记是否存在就行了，所以相当节省内存，特别适合海量的数据处理。可以用于网络爬虫的url重复过滤、垃圾邮件的过滤等等。并且由于省去了存储元素和比较操作，所以性能也比基于hash容器的高了很多。</p>
 
 <p>尽管Bloom Filter通过多个hash算法来降低hash collision，但仍有可能会不属于这个集合的元素误认为属于这个集合。在容忍低错误率的应用场景中，Bloom Filter通过极少的错误换取了存储空间的极大节省。</p>
 
@@ -142,7 +146,7 @@ public:
 
   <section class="section">
   <div class="container has-text-centered">
-    <p>&copy; 2017 - Xiao Wen </br> Power By <a href="https://gohugo.io">HUGO</a> - <a href="https://gitlab.com/beli3ver/hemingway2">hemingway2</a></p>
+    <p>&copy; 2017 - VIN </br> Proudly Power By <a href="https://gohugo.io">HUGO</a> - <a href="https://gitlab.com/beli3ver/hemingway2">hemingway2</a></p>
   </div>
 </section>
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
